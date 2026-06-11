@@ -29,6 +29,14 @@ variable "software_version" {
   type = string
 }
 
+variable "nodes" {
+  type = list(object({
+    node_count   = number
+    machine_type = string
+    services     = list(string)
+  }))
+}
+
 variable "tags" {
   description = "Optional tags"
   type        = map(string)

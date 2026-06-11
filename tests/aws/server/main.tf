@@ -10,4 +10,5 @@ module "server" {
   private_key      = var.private_key
   public_key       = var.public_key
   software_version = var.software_version
+  node_groups      = var.nodes
 }

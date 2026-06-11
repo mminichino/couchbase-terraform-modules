@@ -1,5 +1,14 @@
 # Deploy Cluster Nodes
 
+resource "random_string" "password" {
+  length  = 16
+  special = false
+}
+
+locals {
+  password = coalesce(var.password, random_string.password.result)
+}
+
 data "aws_ami" "ubuntu_linux" {
   most_recent = true
   owners      = ["099720109477"] # Canonical's AWS account ID
@@ -181,6 +190,8 @@ resource "aws_instance" "node_group" {
 
 locals {
   primary_node_key = length(local.nodes) > 0 ? local.nodes[0].key : null
+  primary_node_private_ip = local.primary_node_key != null ? aws_instance.node_group[local.primary_node_key].private_ip : null
+  primary_node_public_ip = local.primary_node_key != null ? aws_instance.node_group[local.primary_node_key].public_ip : null
 }
 
 resource "null_resource" "create_cluster" {
@@ -197,7 +208,7 @@ resource "null_resource" "create_cluster" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo /root/.local/bin/swmgr cluster --name ${var.cluster_name} --ip-address ${aws_instance.node_group[local.primary_node_key].private_ip} --external-ip-address ${aws_instance.node_group[local.primary_node_key].public_ip} --services ${join(",", local.node_map[local.primary_node_key].services)} --server-group ${aws_instance.node_group[local.primary_node_key].availability_zone} --data-path ${var.data_path} create",
+      "sudo /root/.local/bin/swmgr cluster --name ${var.cluster_name} --password ${local.password} --ip-address ${aws_instance.node_group[local.primary_node_key].private_ip} --external-ip-address ${aws_instance.node_group[local.primary_node_key].public_ip} --services ${join(",", local.node_map[local.primary_node_key].services)} --server-group ${aws_instance.node_group[local.primary_node_key].availability_zone} --data-path ${var.data_path} create",
     ]
   }
 }
@@ -219,7 +230,7 @@ resource "null_resource" "join_cluster" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo /root/.local/bin/swmgr cluster --rally-ip-address ${aws_instance.node_group[local.primary_node_key].private_ip} --ip-address ${aws_instance.node_group[each.key].private_ip} --external-ip-address ${aws_instance.node_group[each.key].public_ip} --services ${join(",", each.value.services)} --server-group ${aws_instance.node_group[each.key].availability_zone} --data-path ${var.data_path} add",
+      "sudo /root/.local/bin/swmgr cluster --password ${local.password} --rally-ip-address ${aws_instance.node_group[local.primary_node_key].private_ip} --ip-address ${aws_instance.node_group[each.key].private_ip} --external-ip-address ${aws_instance.node_group[each.key].public_ip} --services ${join(",", each.value.services)} --server-group ${aws_instance.node_group[each.key].availability_zone} --data-path ${var.data_path} add",
     ]
   }
 }
@@ -238,7 +249,7 @@ resource "null_resource" "rebalance" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo /root/.local/bin/swmgr cluster --rally-ip-address ${aws_instance.node_group[local.primary_node_key].private_ip} rebalance",
+      "sudo /root/.local/bin/swmgr cluster --password ${local.password} --rally-ip-address ${aws_instance.node_group[local.primary_node_key].private_ip} rebalance",
     ]
   }
 }

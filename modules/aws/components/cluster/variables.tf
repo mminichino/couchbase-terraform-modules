@@ -15,6 +15,11 @@ variable "data_path" {
   type        = string
 }
 
+variable "password" {
+  type    = string
+  default = null
+}
+
 variable "aws_vpc_id" {
   description = "AWS VPC id"
   type        = string
