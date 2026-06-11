@@ -5,19 +5,24 @@ variable "id" {
   type        = string
 }
 
-variable "node_group" {
-  type    = number
-  default = 0
+variable "cluster_name" {
+  description = "Couchbase cluster name"
+  type        = string
+}
+
+variable "data_path" {
+  description = "Couchbase data path on each node"
+  type        = string
 }
 
 variable "aws_vpc_id" {
   description = "AWS VPC id"
-  type = string
+  type        = string
 }
 
 variable "aws_vpc_cidr" {
   description = "VPC CIDR"
-  type = string
+  type        = string
 }
 
 variable "aws_key_pair" {
@@ -26,12 +31,16 @@ variable "aws_key_pair" {
 
 variable "aws_subnet_id_list" {
   description = "Subnet id list"
-  type = list(string)
+  type        = list(string)
 }
 
-variable "machine_type" {
-  description = "Machine Type"
-  default     = "m5.2xlarge"
+variable "node_groups" {
+  description = "Node group specifications"
+  type = list(object({
+    node_count   = number
+    machine_type = string
+    services     = list(string)
+  }))
 }
 
 variable "root_volume_size" {
@@ -69,14 +78,9 @@ variable "data_volume_size" {
   type        = number
 }
 
-variable "node_count" {
-  description = "Node count"
-  default     = 3
-}
-
 variable "private_key" {
   description = "Private key"
-  type = string
+  type        = string
 }
 
 variable "software_version" {
@@ -90,7 +94,7 @@ variable "host_prep_version" {
 }
 
 variable "admin_user" {
-  type = string
+  type    = string
   default = "ubuntu"
 }
 
