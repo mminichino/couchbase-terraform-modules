@@ -147,7 +147,9 @@ resource "aws_instance" "node_group" {
   }
 
   user_data_base64 = base64encode(templatefile("${path.module}/scripts/server.sh", {
-    version = var.software_version
+    version           = var.software_version
+    host_prep_version = var.host_prep_version
+    admin_user        = var.admin_user
   }))
 
   connection {

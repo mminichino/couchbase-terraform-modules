@@ -12,58 +12,38 @@ fi
 apt update -y
 apt upgrade -y
 
-apt install -y wget curl gnupg2 software-properties-common jq unzip zip
+apt install -y wget curl gnupg2 software-properties-common jq unzip zip net-tools
+apt install -y \
+    build-essential git \
+    libssl-dev zlib1g-dev libbz2-dev \
+    libreadline-dev libsqlite3-dev \
+    libncursesw5-dev xz-utils tk-dev \
+    libxml2-dev libxmlsec1-dev \
+    libffi-dev liblzma-dev uuid-dev
 
-if [ -b /dev/xvdb ]; then
-    DATA_DISK=/dev/xvdb
-    PARTITION=/dev/xvdb1
-elif [ -b /dev/sdb ]; then
-    DATA_DISK=/dev/sdb
-    PARTITION=/dev/sdb1
-else
-    ROOT_DISK=$(lsblk -no pkname "$(findmnt -n -o SOURCE /)")
-    DATA_DISK=$(lsblk -dpno NAME,TYPE | awk '$2=="disk" && $1!="/dev/'"$ROOT_DISK"'" {print $1; exit}')
-    PARTITION="$${DATA_DISK}p1"
-fi
+snap install astral-uv --classic
 
-if [ -z "$DATA_DISK" ] || [ -z "$PARTITION" ]; then
-  echo "No data disk found"
-  exit 1
-fi
+curl -OLs --output-dir /tmp https://github.com/asdf-vm/asdf/releases/download/v0.19.0/asdf-v0.19.0-linux-amd64.tar.gz
+tar xzvf /tmp/asdf-v0.19.0-linux-amd64.tar.gz -C /usr/local/bin
+rm /tmp/asdf-v0.19.0-linux-amd64.tar.gz
 
-parted "$DATA_DISK" --script mklabel gpt
-parted "$DATA_DISK" --script mkpart primary ext4 0% 100%
+export HOME=/root
 
-partprobe "$DATA_DISK"
-udevadm settle
-
-mkfs.ext4 -F "$PARTITION"
-
-mkdir -p /data
-
-mount "$PARTITION" /data
-
-UUID=$(blkid -s UUID -o value "$PARTITION")
-echo "UUID=$UUID /data ext4 defaults,nofail 0 2" >> /etc/fstab
-
-mkdir /tmp/couchbase
-cd /tmp/couchbase || exit
-
-echo "Installing Couchbase Enterprise"
-
-echo "Downloading installation file"
-curl -sLO https://packages.couchbase.com/releases/${version}/couchbase-server-enterprise_${version}-linux_amd64.deb
-
-apt install ./couchbase-server-enterprise_${version}-linux_amd64.deb
-
-cd /
-rm -rf /tmp/couchbase
-
-usermod -a -G couchbase ubuntu
-cat <<EOF >> /home/ubuntu/.bashrc
+cat << 'EOF' >> $HOME/.bashrc
+export PATH=$HOME/.asdf/shims:$PATH
 export PATH=/opt/couchbase/bin:$PATH
+export PATH=$HOME/.local/bin:$PATH
 EOF
 
-sudo chown -R couchbase:couchbase /data
+export PATH=$HOME/.asdf/shims:$HOME/.local/bin:$PATH
+
+asdf plugin add python
+asdf install python 3.12.13
+asdf reshim
+asdf set -u python 3.12.13
+uv tool install https://github.com/mminichino/host-prep-lib/releases/download/${host_prep_version}/pyhostprep-${host_prep_version}-py3-none-any.whl
+uv tool install ansible-core --with ansible
+
+bundlemgr -b CBS -V ${version}
 
 touch "$FLAG_FILE"

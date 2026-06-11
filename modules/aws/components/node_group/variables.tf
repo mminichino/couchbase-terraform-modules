@@ -84,6 +84,16 @@ variable "software_version" {
   type        = string
 }
 
+variable "host_prep_version" {
+  type    = string
+  default = "2.0.0a1"
+}
+
+variable "admin_user" {
+  type = string
+  default = "ubuntu"
+}
+
 variable "tags" {
   description = "Optional tags"
   type        = map(string)
