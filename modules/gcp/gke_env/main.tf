@@ -269,7 +269,7 @@ resource "helm_release" "gcsm_store" {
   namespace        = "external-secrets"
   repository       = "https://mminichino.github.io/helm-charts"
   chart            = "gcsm-store"
-  version          = "0.1.7"
+  version          = "0.1.8"
   cleanup_on_fail  = true
 
   set = [
