@@ -251,6 +251,17 @@ resource "helm_release" "external_secrets" {
   version          = "1.2.1"
   create_namespace = true
   cleanup_on_fail  = true
+
+  values = [
+    yamlencode({
+      serviceAccount = {
+        name = "external-secrets-sa"
+        annotations = {
+          "iam.gke.io/gcp-service-account" = local.sa_email
+        }
+      }
+    })
+  ]
 }
 
 resource "helm_release" "gcsm_store" {
