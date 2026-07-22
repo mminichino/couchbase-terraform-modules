@@ -7,5 +7,5 @@ variable "namespace" {
 
 variable "operator_version" {
   type    = string
-  default = "2.9.2"
+  default = "2.92.0"
 }
