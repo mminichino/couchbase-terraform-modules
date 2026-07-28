@@ -20,6 +20,10 @@ output "aws_key_pair" {
   value = module.key_pair.key_name
 }
 
+output "private_key" {
+  value = local.private_key
+}
+
 output "nodes" {
   description = "Ordered list of deployed nodes (group 0 node 0 first)"
   value       = module.nodes.nodes

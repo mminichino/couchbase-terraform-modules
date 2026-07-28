@@ -5,26 +5,14 @@ variable "region" {
   default = "us-east-2"
 }
 
-# variable "ec2_role" {
-#   type = string
-# }
-#
-# variable "dns_domain" {
-#   type = string
-# }
-#
-variable "public_key" {
+variable "public_key_secret_name" {
   type = string
 }
 
-variable "private_key" {
+variable "private_key_secret_name" {
   type = string
 }
-#
-# variable "bucket" {
-#   type = string
-# }
-#
+
 variable "software_version" {
   type = string
 }

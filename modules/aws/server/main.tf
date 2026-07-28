@@ -16,9 +16,14 @@ module "vpc" {
 }
 
 module "key_pair" {
-  source     = "../components/key_pair"
-  id         = module.id.id
-  public_key = var.public_key
+  source                  = "../components/key_pair"
+  id                      = module.id.id
+  private_key_secret_name = var.private_key_secret_name
+  public_key_secret_name  = var.public_key_secret_name
+}
+
+locals {
+  private_key = module.key_pair.private_key
 }
 
 module "nodes" {
@@ -29,7 +34,7 @@ module "nodes" {
   id                 = module.id.id
   cluster_name       = var.cluster_name
   data_path          = var.data_path
-  private_key        = var.private_key
+  private_key        = local.private_key
   software_version   = var.software_version
   aws_key_pair       = module.key_pair.key_name
   node_groups        = var.node_groups
