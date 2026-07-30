@@ -70,13 +70,3 @@ resource "aws_neptune_subnet_group" "this" {
     Name = "neptune-subnet-group-${local.name}"
   })
 }
-
-resource "aws_dms_replication_subnet_group" "this" {
-  replication_subnet_group_id          = "dms-${local.name}"
-  replication_subnet_group_description = "DMS replication subnet group ${local.name}"
-  subnet_ids                           = local.subnet_ids
-
-  tags = merge(var.tags, {
-    Name = "dms-subnet-group-${local.name}"
-  })
-}
