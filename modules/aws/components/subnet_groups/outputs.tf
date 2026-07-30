@@ -32,7 +32,3 @@ output "dax_subnet_group_name" {
 output "neptune_subnet_group_name" {
   value = aws_neptune_subnet_group.this.name
 }
-
-output "dms_replication_subnet_group_id" {
-  value = aws_dms_replication_subnet_group.this.replication_subnet_group_id
-}
