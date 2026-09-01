@@ -11,7 +11,7 @@ module "id" {
 module "vpc" {
   source                = "../components/vpc"
   id                    = module.id.id
-  cidr_block            = "10.81.0.0/16"
+  cidr_block            = var.vpc_cidr
   tags                  = var.tags
 }
 

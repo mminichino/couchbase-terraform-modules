@@ -5,6 +5,11 @@ variable "region" {
   default = "us-east-2"
 }
 
+variable "vpc_cidr" {
+  type    = string
+  default = "10.81.0.0/16"
+}
+
 variable "public_key_secret_name" {
   description = "Name of the AWS Secrets Manager secret containing the SSH public key (JSON key: \"key\")"
   type        = string
