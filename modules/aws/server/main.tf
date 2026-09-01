@@ -20,6 +20,9 @@ module "key_pair" {
   id                      = module.id.id
   private_key_secret_name = var.private_key_secret_name
   public_key_secret_name  = var.public_key_secret_name
+  public_key_file         = var.public_key_file
+  private_key_file        = var.private_key_file
+  tags                    = var.tags
 }
 
 locals {
@@ -34,6 +37,8 @@ module "nodes" {
   id                 = module.id.id
   cluster_name       = var.cluster_name
   data_path          = var.data_path
+  password           = var.password
+  password_secret    = var.password_secret
   private_key        = local.private_key
   software_version   = var.software_version
   aws_key_pair       = module.key_pair.key_name

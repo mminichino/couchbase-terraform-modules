@@ -1,12 +1,22 @@
 # Deploy Cluster Nodes
 
 resource "random_string" "password" {
+  count   = var.password == null && var.password_secret == null ? 1 : 0
   length  = 16
   special = false
 }
 
+data "aws_secretsmanager_secret_version" "password" {
+  count     = var.password == null && var.password_secret != null ? 1 : 0
+  secret_id = var.password_secret
+}
+
 locals {
-  password = coalesce(var.password, random_string.password.result)
+  password = coalesce(
+    var.password,
+    var.password_secret != null ? jsondecode(data.aws_secretsmanager_secret_version.password[0].secret_string)["password"] : null,
+    random_string.password[0].result,
+  )
 }
 
 data "aws_ami" "ubuntu_linux" {

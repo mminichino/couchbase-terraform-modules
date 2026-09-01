@@ -20,6 +20,12 @@ variable "password" {
   default = null
 }
 
+variable "password_secret" {
+  description = "Name of the AWS Secrets Manager secret containing the cluster password (key: \"password\")"
+  type        = string
+  default     = null
+}
+
 variable "aws_vpc_id" {
   description = "AWS VPC id"
   type        = string
