@@ -12,10 +12,8 @@ data "aws_secretsmanager_secret_version" "password" {
 }
 
 locals {
-  password = coalesce(
-    var.password,
-    var.password_secret != null ? jsondecode(data.aws_secretsmanager_secret_version.password[0].secret_string)["password"] : null,
-    random_string.password[0].result,
+  password = var.password != null ? var.password : (
+    var.password_secret != null ? jsondecode(data.aws_secretsmanager_secret_version.password[0].secret_string)["password"] : random_string.password[0].result
   )
 }
 
