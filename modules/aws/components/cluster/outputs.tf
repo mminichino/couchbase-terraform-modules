@@ -32,3 +32,7 @@ output "cluster_password" {
   sensitive   = true
   value       = local.password
 }
+
+output "security_group" {
+  value = aws_security_group.couchbase_sg.id
+}

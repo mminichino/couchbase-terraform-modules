@@ -12,6 +12,10 @@ output "subnet_id_list" {
   value = module.vpc.subnet_id_list
 }
 
+output "security_group" {
+  value = module.nodes.security_group
+}
+
 output "vpc_cidr" {
   value = module.vpc.vpc_cidr
 }
