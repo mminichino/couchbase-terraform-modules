@@ -1,5 +1,15 @@
 #
 
+output "organization_id" {
+  description = "Organization ID"
+  value       = couchbase-capella_cluster.this.organization_id
+}
+
+output "project_id" {
+  description = "Project ID"
+  value       = couchbase-capella_cluster.this.project_id
+}
+
 output "cluster_id" {
   description = "Capella cluster ID"
   value       = couchbase-capella_cluster.this.id
