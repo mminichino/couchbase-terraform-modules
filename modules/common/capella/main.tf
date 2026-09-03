@@ -32,7 +32,7 @@ data "aws_secretsmanager_secret_version" "db_password" {
 locals {
   db_password = var.db_password != null ? var.db_password : (
     var.db_password_secret != null
-    ? jsondecode(data.aws_secretsmanager_secret_version.db_password[0].secret_string)["key"]
+    ? jsondecode(data.aws_secretsmanager_secret_version.db_password[0].secret_string)["password"]
     : random_password.db_password[0].result
   )
 }
