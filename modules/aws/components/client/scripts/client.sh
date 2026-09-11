@@ -75,4 +75,8 @@ while IFS=: read -r username _ uid gid _ home shell; do
     echo "Added '$username' to docker group"
 done < /etc/passwd
 
+curl -sfL https://get.k3s.io | sh -
+chmod +r /etc/rancher/k3s/k3s.yaml
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4 | bash
+
 touch "$FLAG_FILE"
