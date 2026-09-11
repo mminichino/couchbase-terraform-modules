@@ -63,7 +63,7 @@ while IFS=: read -r username _ uid gid _ home shell; do
         continue
     fi
 
-    if [[ "$uid" -lt "$UID_MIN" ]]; then
+    if [[ "$uid" -lt "$UID_MIN" || "$uid" -ge 65534 ]]; then
         continue
     fi
 
