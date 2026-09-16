@@ -18,9 +18,9 @@ terraform {
 }
 
 resource "random_password" "db_password" {
-  count   = var.db_password == null && var.db_password_secret == null ? 1 : 0
-  length  = 16
-  special = true
+  count            = var.db_password == null && var.db_password_secret == null ? 1 : 0
+  length           = 16
+  special          = true
   override_special = "!@#$%^()_+-=[]{}|'"
 }
 

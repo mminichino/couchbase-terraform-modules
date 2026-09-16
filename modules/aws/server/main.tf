@@ -9,10 +9,10 @@ module "id" {
 }
 
 module "vpc" {
-  source                = "../components/vpc"
-  id                    = module.id.id
-  cidr_block            = var.vpc_cidr
-  tags                  = var.tags
+  source     = "../components/vpc"
+  id         = module.id.id
+  cidr_block = var.vpc_cidr
+  tags       = var.tags
 }
 
 module "key_pair" {

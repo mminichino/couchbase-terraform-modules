@@ -20,6 +20,11 @@ output "vpc_cidr" {
   value = module.vpc.vpc_cidr
 }
 
+output "route_table_id" {
+  description = "Primary public route table ID"
+  value       = module.vpc.route_table_id
+}
+
 output "aws_key_pair" {
   value = module.key_pair.key_name
 }

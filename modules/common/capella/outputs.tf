@@ -30,6 +30,16 @@ output "current_state" {
   value       = couchbase-capella_cluster.this.current_state
 }
 
+output "cloud_provider_cidr" {
+  description = "CIDR block of the Capella cluster VPC (for VPC peering routes)"
+  value       = couchbase-capella_cluster.this.cloud_provider.cidr
+}
+
+output "region" {
+  description = "Cloud provider region of the Capella cluster"
+  value       = couchbase-capella_cluster.this.cloud_provider.region
+}
+
 output "allowlist_id" {
   description = "ID of the created allowlist entry"
   value       = couchbase-capella_allowlist.this.id
