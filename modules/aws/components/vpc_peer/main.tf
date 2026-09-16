@@ -30,7 +30,9 @@ locals {
   # regexall returns a list of matches; each match with one capture group is a list of one string.
   hosted_zone_id = regexall("--hosted-zone-id=([A-Z0-9]+)", local.associate_command)[0][0]
 
-  route_table_ids = length(var.route_table_ids) > 0 ? toset(var.route_table_ids) : toset(data.aws_route_tables.vpc[0].ids)
+  # Use a list (not a set) so routes can use count. for_each requires known keys at
+  # plan time; route table IDs from a sibling module are often unknown until apply.
+  route_table_ids = length(var.route_table_ids) > 0 ? var.route_table_ids : data.aws_route_tables.vpc[0].ids
 
   # Capella is the peering requester; cidr_block is RequesterVpcInfo.
   capella_cidr = coalesce(var.capella_cidr, data.aws_vpc_peering_connection.this.cidr_block)
@@ -71,9 +73,9 @@ resource "aws_route53_zone_association" "capella" {
 }
 
 resource "aws_route" "capella" {
-  for_each = local.route_table_ids
+  count = length(local.route_table_ids)
 
-  route_table_id            = each.value
+  route_table_id            = local.route_table_ids[count.index]
   destination_cidr_block    = local.capella_cidr
   vpc_peering_connection_id = aws_vpc_peering_connection_accepter.this.id
 

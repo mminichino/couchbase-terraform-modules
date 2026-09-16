@@ -22,7 +22,7 @@ output "hosted_zone_id" {
 
 output "route_table_ids" {
   description = "Route table IDs updated with a route to Capella"
-  value       = sort(tolist(local.route_table_ids))
+  value       = local.route_table_ids
 }
 
 output "status" {
