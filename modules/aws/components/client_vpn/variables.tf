@@ -99,7 +99,7 @@ variable "cloudwatch_log_retention_days" {
 }
 
 variable "certificate_common_name" {
-  description = "Common name for the generated self-signed server certificate"
+  description = "Common name for the generated CA-signed server certificate"
   type        = string
   default     = "client-vpn.internal"
 }
