@@ -8,8 +8,8 @@ terraform {
       source  = "hashicorp/tls"
       version = "~> 4.0"
     }
-    external = {
-      source  = "hashicorp/external"
+    local = {
+      source  = "hashicorp/local"
       version = "~> 2.0"
     }
   }

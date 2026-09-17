@@ -61,7 +61,7 @@ override.tf.json
 **/tmp_plan
 **/.tmp
 **/tmp
-
+*.ovpn
 test/fixtures/shared/terraform.tfvars
 
 test/integration/gcloud/config.sh

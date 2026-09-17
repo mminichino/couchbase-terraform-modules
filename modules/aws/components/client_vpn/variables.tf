@@ -27,33 +27,10 @@ variable "client_cidr_block" {
   default     = "10.250.0.0/16"
 }
 
-variable "server_certificate_arn" {
-  description = "ACM certificate ARN for the Client VPN server. If null, a self-signed certificate is created."
-  type        = string
-  default     = null
-}
-
-variable "saml_provider_arn" {
-  description = "IAM SAML provider ARN. If null, the single preconfigured provider in the account is discovered automatically."
-  type        = string
-  default     = null
-}
-
 variable "split_tunnel" {
   description = "Enable split tunnel so only VPC-bound traffic uses the VPN"
   type        = bool
   default     = true
-}
-
-variable "self_service_portal" {
-  description = "Enable the Client VPN self-service portal (enabled or disabled)"
-  type        = string
-  default     = "disabled"
-
-  validation {
-    condition     = contains(["enabled", "disabled"], var.self_service_portal)
-    error_message = "self_service_portal must be \"enabled\" or \"disabled\"."
-  }
 }
 
 variable "dns_servers" {
@@ -81,13 +58,13 @@ variable "vpn_port" {
 }
 
 variable "authorize_vpc" {
-  description = "Create an authorization rule granting all federated users access to the VPC CIDR"
+  description = "Create an authorization rule granting VPN clients access to the VPC CIDR"
   type        = bool
   default     = true
 }
 
 variable "additional_authorized_cidrs" {
-  description = "Extra CIDRs to authorize for all VPN users (e.g. Capella CIDR via peering/PrivateLink)"
+  description = "Extra CIDRs to authorize for VPN clients (e.g. Capella CIDR via peering/PrivateLink)"
   type        = list(string)
   default     = []
 }
@@ -102,6 +79,18 @@ variable "certificate_common_name" {
   description = "Common name for the generated CA-signed server certificate"
   type        = string
   default     = "client-vpn.internal"
+}
+
+variable "client_certificate_common_name" {
+  description = "Common name for the generated client certificate"
+  type        = string
+  default     = "client.client-vpn.internal"
+}
+
+variable "ovpn_output_path" {
+  description = "If set, write the mutual-auth .ovpn profile (with embedded client cert/key) to this path"
+  type        = string
+  default     = null
 }
 
 variable "tags" {

@@ -15,19 +15,9 @@ output "dns_name" {
   value       = aws_ec2_client_vpn_endpoint.this.dns_name
 }
 
-output "self_service_portal_url" {
-  description = "Self-service portal URL (when enabled)"
-  value       = aws_ec2_client_vpn_endpoint.this.self_service_portal_url
-}
-
-output "saml_provider_arn" {
-  description = "IAM SAML provider ARN used for federated authentication"
-  value       = local.saml_provider_arn
-}
-
 output "server_certificate_arn" {
   description = "ACM server certificate ARN used by the endpoint"
-  value       = local.server_certificate_arn
+  value       = aws_acm_certificate.server.arn
 }
 
 output "security_group_id" {
@@ -38,4 +28,27 @@ output "security_group_id" {
 output "network_association_ids" {
   description = "Client VPN network association IDs"
   value       = aws_ec2_client_vpn_network_association.this[*].id
+}
+
+output "ovpn_config" {
+  description = "Mutual-auth Client VPN profile with embedded client certificate and key"
+  value       = local.ovpn
+  sensitive   = true
+}
+
+output "client_certificate_pem" {
+  description = "Client certificate PEM"
+  value       = tls_locally_signed_cert.client.cert_pem
+  sensitive   = true
+}
+
+output "client_private_key_pem" {
+  description = "Client private key PEM"
+  value       = tls_private_key.client.private_key_pem
+  sensitive   = true
+}
+
+output "ovpn_file_path" {
+  description = "Path to the written .ovpn file when ovpn_output_path is set"
+  value       = try(local_sensitive_file.ovpn[0].filename, null)
 }
