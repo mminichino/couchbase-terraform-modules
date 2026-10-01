@@ -109,7 +109,7 @@ variable "host_prep_version" {
 variable "cbctl_version" {
   description = "cbctl release tag installed from github.com/mminichino/cbctl"
   type        = string
-  default     = "v0.3.0"
+  default     = "v0.4.0"
 }
 
 variable "admin_user" {
