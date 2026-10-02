@@ -80,6 +80,18 @@ variable "data_volume_type" {
   type        = string
 }
 
+variable "root_volume_size" {
+  description = "The root volume size in GB"
+  default     = 64
+  type        = number
+}
+
+variable "root_volume_type" {
+  description = "The root volume type"
+  default     = "pd-ssd"
+  type        = string
+}
+
 variable "node_groups" {
   type = list(object({
     node_count   = number
