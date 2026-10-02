@@ -68,6 +68,18 @@ variable "data_path" {
   default     = "/cbdata"
 }
 
+variable "data_volume_size" {
+  description = "The data volume size in GB"
+  default     = 256
+  type        = number
+}
+
+variable "data_volume_type" {
+  description = "The data volume type"
+  default     = "pd-ssd"
+  type        = string
+}
+
 variable "node_groups" {
   type = list(object({
     node_count   = number

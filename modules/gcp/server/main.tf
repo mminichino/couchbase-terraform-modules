@@ -46,5 +46,7 @@ module "nodes" {
   public_key       = module.key_pair.public_key
   software_version = var.software_version
   node_groups      = var.node_groups
+  data_volume_size = var.data_volume_size
+  data_volume_type = var.data_volume_type
   labels           = var.labels
 }
