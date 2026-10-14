@@ -49,6 +49,24 @@ variable "root_volume_iops" {
   type        = number
 }
 
+variable "data_volume_iops" {
+  description = "The data volume IOPS"
+  default     = 10000
+  type        = number
+}
+
+variable "data_volume_throughput" {
+  description = "The data volume throughput"
+  default     = 600
+  type        = number
+}
+
+variable "data_volume_size" {
+  description = "The data volume size"
+  default     = 256
+  type        = number
+}
+
 variable "private_key" {
   description = "Private key"
   type        = string

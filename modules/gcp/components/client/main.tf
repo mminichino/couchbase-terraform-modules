@@ -56,6 +56,19 @@ resource "google_compute_firewall" "internal" {
   target_tags   = [local.network_tag]
 }
 
+resource "google_compute_disk" "data" {
+  for_each = local.node_map
+  name     = "data-${each.key}-${var.id}"
+  type     = var.data_volume_type
+  size     = var.data_volume_size
+  zone     = each.value.zone
+  project  = var.gcp_project_id
+
+  labels = merge(var.labels, {
+    name = "data-${each.key}-${var.id}"
+  })
+}
+
 resource "google_compute_instance" "node_group" {
   for_each     = local.node_map
   name         = "client${each.value.group_index}${each.value.node_index + 1}-${var.id}"
@@ -75,6 +88,11 @@ resource "google_compute_instance" "node_group" {
       size  = var.root_volume_size
       type  = var.root_volume_type
     }
+  }
+
+  attached_disk {
+    source      = google_compute_disk.data[each.key].id
+    device_name = "sdb"
   }
 
   network_interface {

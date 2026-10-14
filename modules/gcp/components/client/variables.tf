@@ -55,6 +55,18 @@ variable "root_volume_type" {
   type        = string
 }
 
+variable "data_volume_type" {
+  description = "The data volume type"
+  default     = "pd-ssd"
+  type        = string
+}
+
+variable "data_volume_size" {
+  description = "The data volume size"
+  default     = 256
+  type        = number
+}
+
 variable "private_key" {
   description = "Private key"
   type        = string

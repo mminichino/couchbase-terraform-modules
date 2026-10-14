@@ -97,6 +97,14 @@ resource "aws_instance" "node_group" {
     iops        = var.root_volume_iops
   }
 
+  ebs_block_device {
+    device_name = "/dev/sdb"
+    volume_type = "gp3"
+    volume_size = var.data_volume_size
+    iops        = var.data_volume_iops
+    throughput  = var.data_volume_throughput
+  }
+
   user_data_base64 = base64encode(templatefile("${path.module}/scripts/client.sh", {
     host_prep_version = var.host_prep_version
   }))
