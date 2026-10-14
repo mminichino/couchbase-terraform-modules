@@ -58,7 +58,7 @@ resource "google_compute_firewall" "internal" {
 
 resource "google_compute_disk" "data" {
   for_each = local.node_map
-  name     = "data-${each.key}-${var.id}"
+  name     = "client-${each.key}-${var.id}"
   type     = var.data_volume_type
   size     = var.data_volume_size
   zone     = each.value.zone
