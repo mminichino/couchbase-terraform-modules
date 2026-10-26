@@ -81,7 +81,7 @@ variable "private_key" {
 
 variable "host_prep_version" {
   type    = string
-  default = "2.0.0a1"
+  default = "2.0.0"
 }
 
 variable "labels" {
