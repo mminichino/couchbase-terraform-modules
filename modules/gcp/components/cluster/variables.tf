@@ -64,6 +64,13 @@ variable "node_groups" {
     machine_type = string
     services     = list(string)
   }))
+  default = [
+    {
+      node_count   = 3
+      machine_type = "n4-standard-8"
+      services     = ["data", "index", "query"]
+    }
+  ]
 }
 
 variable "root_volume_size" {
@@ -73,8 +80,8 @@ variable "root_volume_size" {
 }
 
 variable "root_volume_type" {
-  description = "The root volume type"
-  default     = "pd-ssd"
+  description = "Boot disk type. N4 boot disks must be hyperdisk-balanced or hyperdisk-balanced-high-availability."
+  default     = "hyperdisk-balanced"
   type        = string
 }
 
@@ -85,8 +92,8 @@ variable "data_volume_size" {
 }
 
 variable "data_volume_type" {
-  description = "The data volume type"
-  default     = "pd-ssd"
+  description = "Data disk type. N4 supports only Hyperdisk: hyperdisk-balanced, hyperdisk-balanced-high-availability, or hyperdisk-throughput."
+  default     = "hyperdisk-balanced"
   type        = string
 }
 
