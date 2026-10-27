@@ -76,7 +76,7 @@ variable "data_volume_size" {
 
 variable "data_volume_type" {
   description = "The data volume type"
-  default     = "pd-ssd"
+  default     = "hyperdisk-balanced"
   type        = string
 }
 
@@ -88,7 +88,7 @@ variable "root_volume_size" {
 
 variable "root_volume_type" {
   description = "The root volume type"
-  default     = "pd-ssd"
+  default     = "hyperdisk-balanced"
   type        = string
 }
 
@@ -101,7 +101,7 @@ variable "node_groups" {
   default = [
     {
       node_count   = 3
-      machine_type = "n2-standard-4"
+      machine_type = "n4-standard-8"
       services     = ["data", "index", "query"]
     }
   ]
