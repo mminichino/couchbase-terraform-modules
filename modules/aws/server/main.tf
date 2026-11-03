@@ -41,6 +41,7 @@ module "nodes" {
   password_secret    = var.password_secret
   private_key        = local.private_key
   software_version   = var.software_version
+  cbctl_version      = var.cbctl_version
   aws_key_pair       = module.key_pair.key_name
   node_groups        = var.node_groups
   tags               = var.tags

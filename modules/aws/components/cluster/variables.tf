@@ -90,8 +90,22 @@ variable "data_volume_size" {
 }
 
 variable "private_key" {
-  description = "Private key"
+  description = "SSH private key content. Used when private_key_file and private_key_secret are not set."
   type        = string
+  default     = null
+  sensitive   = true
+}
+
+variable "private_key_secret" {
+  description = "Name of the AWS Secrets Manager secret containing the SSH private key (JSON key: \"key\")"
+  type        = string
+  default     = null
+}
+
+variable "private_key_file" {
+  description = "SSH private key filename in ~/.ssh (e.g. id_rsa). Used instead of private_key_secret when set."
+  type        = string
+  default     = null
 }
 
 variable "software_version" {
@@ -102,6 +116,12 @@ variable "software_version" {
 variable "host_prep_version" {
   type    = string
   default = "2.0.0"
+}
+
+variable "cbctl_version" {
+  description = "cbctl release tag installed from github.com/mminichino/cbctl"
+  type        = string
+  default     = "v0.5.0"
 }
 
 variable "admin_user" {

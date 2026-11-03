@@ -50,6 +50,12 @@ variable "software_version" {
   type = string
 }
 
+variable "cbctl_version" {
+  description = "cbctl release tag installed from github.com/mminichino/cbctl"
+  type        = string
+  default     = "v0.5.0"
+}
+
 variable "cluster_name" {
   description = "Couchbase cluster name"
   type        = string

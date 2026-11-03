@@ -11,9 +11,19 @@ data "aws_secretsmanager_secret_version" "password" {
   secret_id = var.password_secret
 }
 
+data "aws_secretsmanager_secret_version" "private_key" {
+  count     = var.private_key == null && var.private_key_file == null && var.private_key_secret != null ? 1 : 0
+  secret_id = var.private_key_secret
+}
+
 locals {
   password = var.password != null ? var.password : (
     var.password_secret != null ? jsondecode(data.aws_secretsmanager_secret_version.password[0].secret_string)["password"] : random_string.password[0].result
+  )
+
+  private_key_path = var.private_key_file != null ? pathexpand("~/.ssh/${var.private_key_file}") : null
+  private_key = var.private_key != null ? var.private_key : (
+    var.private_key_file != null ? file(local.private_key_path) : replace(jsondecode(data.aws_secretsmanager_secret_version.private_key[0].secret_string)["key"], "\\n", "\n")
   )
 }
 
@@ -176,12 +186,13 @@ resource "aws_instance" "node_group" {
     version           = var.software_version
     host_prep_version = var.host_prep_version
     admin_user        = var.admin_user
+    cbctl_version     = var.cbctl_version
   }))
 
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = var.private_key
+    private_key = local.private_key
     host        = self.public_ip
   }
 
@@ -197,12 +208,26 @@ resource "aws_instance" "node_group" {
 }
 
 locals {
-  primary_node_key = length(local.nodes) > 0 ? local.nodes[0].key : null
+  primary_node_key        = length(local.nodes) > 0 ? local.nodes[0].key : null
   primary_node_private_ip = local.primary_node_key != null ? aws_instance.node_group[local.primary_node_key].private_ip : null
-  primary_node_public_ip = local.primary_node_key != null ? aws_instance.node_group[local.primary_node_key].public_ip : null
+  primary_node_public_ip  = local.primary_node_key != null ? aws_instance.node_group[local.primary_node_key].public_ip : null
+
+  cluster_bootstrap = local.primary_node_key == null ? [] : concat(
+    [
+      "sudo /usr/local/bin/cbctl cluster create --name ${var.cluster_name} --password ${local.password} --ip-address ${local.primary_node_private_ip} --external-ip-address ${local.primary_node_public_ip} --services ${join(",", local.node_map[local.primary_node_key].services)} --server-group ${aws_instance.node_group[local.primary_node_key].availability_zone} --data-path ${var.data_path} --no-ssl",
+    ],
+    [
+      for node in local.nodes :
+      "sudo /usr/local/bin/cbctl cluster join --password ${local.password} --rally-ip-address ${local.primary_node_private_ip} --ip-address ${aws_instance.node_group[node.key].private_ip} --external-ip-address ${aws_instance.node_group[node.key].public_ip} --services ${join(",", node.services)} --server-group ${aws_instance.node_group[node.key].availability_zone} --data-path ${var.data_path} --no-ssl"
+      if node.global_index > 0
+    ],
+    [
+      "sudo /usr/local/bin/cbctl cluster rebalance --password ${local.password} --rally-ip-address ${local.primary_node_private_ip} --no-ssl",
+    ],
+  )
 }
 
-resource "null_resource" "create_cluster" {
+resource "null_resource" "bootstrap_cluster" {
   count = local.primary_node_key != null ? 1 : 0
 
   depends_on = [aws_instance.node_group]
@@ -210,54 +235,11 @@ resource "null_resource" "create_cluster" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = var.private_key
-    host        = aws_instance.node_group[local.primary_node_key].public_ip
+    private_key = local.private_key
+    host        = local.primary_node_public_ip
   }
 
   provisioner "remote-exec" {
-    inline = [
-      "sudo /root/.local/bin/swmgr cluster --name ${var.cluster_name} --password ${local.password} --ip-address ${aws_instance.node_group[local.primary_node_key].private_ip} --external-ip-address ${aws_instance.node_group[local.primary_node_key].public_ip} --services ${join(",", local.node_map[local.primary_node_key].services)} --server-group ${aws_instance.node_group[local.primary_node_key].availability_zone} --data-path ${var.data_path} create",
-    ]
-  }
-}
-
-resource "null_resource" "join_cluster" {
-  for_each = {
-    for node in local.nodes : node.key => node
-    if node.global_index > 0
-  }
-
-  depends_on = [null_resource.create_cluster, aws_instance.node_group]
-
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = var.private_key
-    host        = aws_instance.node_group[each.key].public_ip
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo /root/.local/bin/swmgr cluster --password ${local.password} --rally-ip-address ${aws_instance.node_group[local.primary_node_key].private_ip} --ip-address ${aws_instance.node_group[each.key].private_ip} --external-ip-address ${aws_instance.node_group[each.key].public_ip} --services ${join(",", each.value.services)} --server-group ${aws_instance.node_group[each.key].availability_zone} --data-path ${var.data_path} add",
-    ]
-  }
-}
-
-resource "null_resource" "rebalance" {
-  count = local.primary_node_key != null ? 1 : 0
-
-  depends_on = [null_resource.create_cluster, null_resource.join_cluster]
-
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = var.private_key
-    host        = aws_instance.node_group[local.primary_node_key].public_ip
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo /root/.local/bin/swmgr cluster --password ${local.password} --rally-ip-address ${aws_instance.node_group[local.primary_node_key].private_ip} rebalance",
-    ]
+    inline = local.cluster_bootstrap
   }
 }

@@ -46,4 +46,9 @@ uv tool install ansible-core --with ansible
 
 bundlemgr -b CBS -V ${version}
 
+curl -fsSL -o /tmp/cbctl.tar.gz "https://github.com/mminichino/cbctl/releases/download/${cbctl_version}/cbctl_Linux_x86_64.tar.gz"
+tar -xzf /tmp/cbctl.tar.gz -C /usr/local/bin cbctl
+chmod 755 /usr/local/bin/cbctl
+rm -f /tmp/cbctl.tar.gz
+
 touch "$FLAG_FILE"

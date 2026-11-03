@@ -1,5 +1,17 @@
 # Deploy Cluster Nodes
 
+data "aws_secretsmanager_secret_version" "private_key" {
+  count     = var.private_key == null && var.private_key_file == null && var.private_key_secret != null ? 1 : 0
+  secret_id = var.private_key_secret
+}
+
+locals {
+  private_key_path = var.private_key_file != null ? pathexpand("~/.ssh/${var.private_key_file}") : null
+  private_key = var.private_key != null ? var.private_key : (
+    var.private_key_file != null ? file(local.private_key_path) : replace(jsondecode(data.aws_secretsmanager_secret_version.private_key[0].secret_string)["key"], "\\n", "\n")
+  )
+}
+
 data "aws_ami" "ubuntu_linux" {
   most_recent = true
   owners      = ["099720109477"] # Canonical's AWS account ID
@@ -112,7 +124,7 @@ resource "aws_instance" "node_group" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = var.private_key
+    private_key = local.private_key
     host        = self.public_ip
   }
 
