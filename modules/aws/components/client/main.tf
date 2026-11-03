@@ -92,6 +92,15 @@ locals {
   ]
 
   node_map = { for node in local.nodes : node.key => node }
+
+  # Capella AWS gp3/io2 default IOPS by storage size:
+  # https://docs.couchbase.com/cloud/clusters/scale-database.html#IOPS-Defaults
+  root_volume_iops = var.root_volume_iops != null ? var.root_volume_iops : (
+    var.root_volume_size >= 1000 ? 16000 : 3000 + floor(var.root_volume_size / 100) * 1370
+  )
+  data_volume_iops = var.data_volume_iops != null ? var.data_volume_iops : (
+    var.data_volume_size >= 1000 ? 16000 : 3000 + floor(var.data_volume_size / 100) * 1370
+  )
 }
 
 resource "aws_instance" "node_group" {
@@ -106,14 +115,14 @@ resource "aws_instance" "node_group" {
   root_block_device {
     volume_size = var.root_volume_size
     volume_type = var.root_volume_type
-    iops        = var.root_volume_iops
+    iops        = local.root_volume_iops
   }
 
   ebs_block_device {
     device_name = "/dev/sdb"
     volume_type = "gp3"
     volume_size = var.data_volume_size
-    iops        = var.data_volume_iops
+    iops        = local.data_volume_iops
     throughput  = var.data_volume_throughput
   }
 

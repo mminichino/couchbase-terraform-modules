@@ -44,5 +44,7 @@ module "nodes" {
   cbctl_version      = var.cbctl_version
   aws_key_pair       = module.key_pair.key_name
   node_groups        = var.node_groups
+  root_volume_size   = var.root_volume_size
+  data_volume_size   = var.data_volume_size
   tags               = var.tags
 }

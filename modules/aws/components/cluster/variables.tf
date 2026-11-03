@@ -55,7 +55,7 @@ variable "node_groups" {
 }
 
 variable "root_volume_size" {
-  description = "The root volume size"
+  description = "The root volume size in GB"
   default     = 64
   type        = number
 }
@@ -66,14 +66,14 @@ variable "root_volume_type" {
 }
 
 variable "root_volume_iops" {
-  description = "The root volume IOPS"
-  default     = 3000
+  description = "Root volume IOPS. When null, uses Couchbase Capella AWS gp3 defaults for root_volume_size."
+  default     = null
   type        = number
 }
 
 variable "data_volume_iops" {
-  description = "The data volume IOPS"
-  default     = 10000
+  description = "Data volume IOPS. When null, uses Couchbase Capella AWS gp3 defaults for data_volume_size."
+  default     = null
   type        = number
 }
 
@@ -84,7 +84,7 @@ variable "data_volume_throughput" {
 }
 
 variable "data_volume_size" {
-  description = "The data volume size"
+  description = "The data volume size in GB"
   default     = 256
   type        = number
 }

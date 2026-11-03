@@ -68,6 +68,18 @@ variable "data_path" {
   default     = "/cbdata"
 }
 
+variable "root_volume_size" {
+  description = "Root volume size in GB. IOPS are set from Couchbase Capella AWS gp3 defaults for this size."
+  type        = number
+  default     = 64
+}
+
+variable "data_volume_size" {
+  description = "Data volume size in GB. IOPS are set from Couchbase Capella AWS gp3 defaults for this size."
+  type        = number
+  default     = 256
+}
+
 variable "node_groups" {
   type = list(object({
     node_count   = number
