@@ -15,8 +15,6 @@ locals {
 data "aws_ami" "oracle_linux" {
   most_recent = true
   owners      = ["131827586825"] # Oracle's AWS account ID
-  # Match legacy (OL8.x-x86_64-HVM-*) and current (OL8-*, Oracle-Linux-8*) names; exclude GPU variants.
-  name_regex = "^(OL8[.-]|Oracle-Linux-8)(?!.*GPU).*"
 
   filter {
     name   = "name"
