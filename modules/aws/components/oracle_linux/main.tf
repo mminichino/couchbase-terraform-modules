@@ -15,10 +15,12 @@ locals {
 data "aws_ami" "oracle_linux" {
   most_recent = true
   owners      = ["131827586825"] # Oracle's AWS account ID
+  # Match legacy (OL8.x-x86_64-HVM-*) and current (OL8-*, Oracle-Linux-8*) names; exclude GPU variants.
+  name_regex = "^(OL8[.-]|Oracle-Linux-8)(?!.*GPU).*"
 
   filter {
     name   = "name"
-    values = ["OL8.*-x86_64-HVM-*"]
+    values = ["OL8*", "Oracle-Linux-8*"]
   }
 
   filter {
@@ -29,6 +31,11 @@ data "aws_ami" "oracle_linux" {
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
   }
 
   filter {
