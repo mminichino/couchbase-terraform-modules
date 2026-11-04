@@ -1,4 +1,4 @@
-# Deploy Oracle Linux 8 Nodes
+# Deploy RHEL 8 Nodes
 
 data "aws_secretsmanager_secret_version" "private_key" {
   count     = var.private_key == null && var.private_key_file == null && var.private_key_secret != null ? 1 : 0
@@ -12,13 +12,13 @@ locals {
   )
 }
 
-data "aws_ami" "oracle_linux" {
+data "aws_ami" "rhel" {
   most_recent = true
-  owners      = ["131827586825"] # Oracle's AWS account ID
+  owners      = ["309956199498"] # Red Hat's AWS account ID
 
   filter {
     name   = "name"
-    values = ["OL8*", "Oracle-Linux-8*"]
+    values = ["RHEL-8.*_HVM-*-x86_64-*-Hourly2-GP3"]
   }
 
   filter {
@@ -46,9 +46,9 @@ data "aws_key_pair" "ssh_key" {
   key_name = var.aws_key_pair
 }
 
-resource "aws_security_group" "oracle_linux_sg" {
-  name        = "${var.id}-oracle-linux-sg"
-  description = "Oracle Linux inbound traffic"
+resource "aws_security_group" "rhel_sg" {
+  name        = "${var.id}-rhel-sg"
+  description = "RHEL inbound traffic"
   vpc_id      = var.aws_vpc_id
 
   ingress {
@@ -114,7 +114,7 @@ resource "aws_security_group" "oracle_linux_sg" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.id}-oracle-linux-sg"
+    Name = "${var.id}-rhel-sg"
   })
 }
 
@@ -150,10 +150,10 @@ locals {
 
 resource "aws_instance" "node_group" {
   for_each                    = local.node_map
-  ami                         = data.aws_ami.oracle_linux.id
+  ami                         = data.aws_ami.rhel.id
   instance_type               = each.value.machine_type
   key_name                    = data.aws_key_pair.ssh_key.key_name
-  vpc_security_group_ids      = [aws_security_group.oracle_linux_sg.id]
+  vpc_security_group_ids      = [aws_security_group.rhel_sg.id]
   subnet_id                   = var.aws_subnet_id_list[each.value.global_index % length(var.aws_subnet_id_list)]
   associate_public_ip_address = true
 
@@ -171,7 +171,7 @@ resource "aws_instance" "node_group" {
     throughput  = var.data_volume_throughput
   }
 
-  user_data_base64 = base64encode(templatefile("${path.module}/scripts/oracle_linux.sh", {
+  user_data_base64 = base64encode(templatefile("${path.module}/scripts/rhel.sh", {
     host_prep_version = var.host_prep_version
   }))
 
@@ -189,6 +189,6 @@ resource "aws_instance" "node_group" {
   }
 
   tags = merge(var.tags, {
-    Name = "ol${each.value.group_index}${each.value.node_index + 1}-${var.id}"
+    Name = "rhel${each.value.group_index}${each.value.node_index + 1}-${var.id}"
   })
 }
