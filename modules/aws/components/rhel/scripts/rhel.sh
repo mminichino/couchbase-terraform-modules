@@ -15,8 +15,10 @@ set -euo pipefail
 dnf update -y
 
 dnf install -y wget curl gnupg2 jq unzip zip net-tools java-17-openjdk-devel python3-pip
+# Build deps for asdf/python-build on RHEL 8. Avoid packages not in RHUI (e.g. xmlsec1-devel).
 dnf install -y \
-    gcc gcc-c++ make git \
+    gcc gcc-c++ make git patch which findutils diffutils \
+    bzip2 xz tar gzip \
     openssl-devel zlib-devel bzip2-devel \
     readline-devel sqlite-devel \
     ncurses-devel xz-devel tk-devel \
@@ -25,9 +27,10 @@ dnf install -y \
 
 curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
 
+# RHEL 8 curl does not support --output-dir
 curl -Ls -o /tmp/asdf-v0.19.0-linux-amd64.tar.gz https://github.com/asdf-vm/asdf/releases/download/v0.19.0/asdf-v0.19.0-linux-amd64.tar.gz
 tar xzvf /tmp/asdf-v0.19.0-linux-amd64.tar.gz -C /usr/local/bin
-rm /tmp/asdf-v0.19.0-linux-amd64.tar.gz
+rm -f /tmp/asdf-v0.19.0-linux-amd64.tar.gz
 
 export HOME=/root
 
@@ -36,7 +39,7 @@ export PATH=$HOME/.asdf/shims:$PATH
 export PATH=$HOME/.local/bin:$PATH
 EOF
 
-export PATH=$HOME/.asdf/shims:$HOME/.local/bin:$PATH
+export PATH=/usr/local/bin:$HOME/.asdf/shims:$HOME/.local/bin:$PATH
 
 asdf plugin add python
 asdf install python 3.12.13
