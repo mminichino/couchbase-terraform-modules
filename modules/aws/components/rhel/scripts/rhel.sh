@@ -10,6 +10,8 @@ if [ -f "$FLAG_FILE" ]; then
   exit 0
 fi
 
+set -euo pipefail
+
 dnf update -y
 
 dnf install -y wget curl gnupg2 jq unzip zip net-tools java-17-openjdk-devel python3-pip
@@ -18,12 +20,12 @@ dnf install -y \
     openssl-devel zlib-devel bzip2-devel \
     readline-devel sqlite-devel \
     ncurses-devel xz-devel tk-devel \
-    libxml2-devel xmlsec1-devel \
+    libxml2-devel \
     libffi-devel libuuid-devel
 
 curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
 
-curl -OLs --output-dir /tmp https://github.com/asdf-vm/asdf/releases/download/v0.19.0/asdf-v0.19.0-linux-amd64.tar.gz
+curl -Ls -o /tmp/asdf-v0.19.0-linux-amd64.tar.gz https://github.com/asdf-vm/asdf/releases/download/v0.19.0/asdf-v0.19.0-linux-amd64.tar.gz
 tar xzvf /tmp/asdf-v0.19.0-linux-amd64.tar.gz -C /usr/local/bin
 rm /tmp/asdf-v0.19.0-linux-amd64.tar.gz
 
