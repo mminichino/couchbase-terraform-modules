@@ -15,6 +15,8 @@ set -euo pipefail
 dnf update -y
 
 dnf install -y wget curl gnupg2 jq unzip zip net-tools java-17-openjdk-devel python3-pip
+alternatives --set java $(alternatives --display java | grep "family java-17-openjdk" | cut -d' ' -f1)
+alternatives --set javac $(alternatives --display javac | grep "family java-17-openjdk" | cut -d' ' -f1)
 # Build deps for asdf/python-build on RHEL 8. Avoid packages not in RHUI (e.g. xmlsec1-devel).
 dnf install -y \
     gcc gcc-c++ make git patch which findutils diffutils \
