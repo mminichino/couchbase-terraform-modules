@@ -51,6 +51,7 @@ resource "helm_release" "external_dns" {
       }
       extraArgs = {
         "google-zone-visibility" = "public"
+        "policy"                 = "sync"
       }
       serviceAccount = {
         name = "external-dns"
