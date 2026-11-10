@@ -81,7 +81,7 @@ resource "google_container_cluster" "kubernetes" {
   cluster_autoscaling {
     auto_provisioning_defaults {
       disk_size = 128
-      disk_type = "pd-ssd"
+      disk_type = "hyperdisk-balanced"
       management {
         auto_upgrade = false
       }
@@ -136,7 +136,7 @@ resource "google_container_node_pool" "worker_nodes" {
 
     machine_type = var.machine_type
     disk_size_gb = 300
-    disk_type    = "pd-ssd"
+    disk_type    = "hyperdisk-balanced"
   }
 }
 

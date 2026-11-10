@@ -63,7 +63,7 @@ variable "max_node_count" {
 variable "machine_type" {
   description = "The machine type for the GKE nodes."
   type        = string
-  default     = "n2-standard-16"
+  default     = "n4-standard-16"
 }
 
 variable "gcp_zone_name" {
